@@ -1,4 +1,5 @@
-// Copyright (c) 2018, The TurtleCoin Developers
+// Copyright (c) 2018-2019, The TurtleCoin Developers
+// Copyright (c) 2019, The Lithe Project Development Team
 // 
 // Please see the included LICENSE file for more information.
 
@@ -40,6 +41,10 @@ Error validateIntegratedAddresses(
 Error validatePaymentID(const std::string paymentID);
 
 Error validateHash(const std::string hash);
+
+Error validatePrivateKey(const Crypto::SecretKey &privateViewKey);
+
+Error validatePublicKey(const Crypto::PublicKey &publicKey);
 
 Error validateMixin(const uint64_t mixin, const uint64_t height);
 
