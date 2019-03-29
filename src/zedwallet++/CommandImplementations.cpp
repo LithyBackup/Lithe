@@ -1,4 +1,6 @@
-// Copyright (c) 2018, The TurtleCoin Developers
+// Copyright (c) 2018-2019, The TurtleCoin Developers
+// Copyright (c) 2018-2019, The Catalyst Developers
+// Copyright (c) 2019, The Lithe Project Development Team
 // 
 // Please see the included LICENSE file for more information.
 
@@ -7,6 +9,7 @@
 ///////////////////////////////////////////////
 
 #include <config/WalletConfig.h>
+#include <config/CryptoNoteConfig.h>
 
 #include <Errors/ValidateParameters.h>
 
@@ -396,8 +399,37 @@ void printOutgoingTransfer(const WalletTypes::Transaction tx)
     {
         stream << "Payment ID: " << tx.paymentID << "\n";
     }
+    
+    
+    /* Display Unlock time, if applicable; otherwise, don't */
+    int64_t difference = tx.unlockTime - tx.blockHeight;
 
-    std::cout << WarningMsg(stream.str()) << std::endl;
+    /* Here we treat Unlock as a block, and treat it that way in the future */
+    if (tx.unlockTime != 0 && difference > 0 && tx.unlockTime < CryptoNote::parameters::CRYPTONOTE_MAX_BLOCK_NUMBER)
+    {
+        int64_t unlockInUnixTime = tx.timestamp + (difference * CryptoNote::parameters::DIFFICULTY_TARGET);
+        std::cout << SuccessMsg(stream.str())
+                  << InformationMsg("Unlock height: ")
+                  << InformationMsg(tx.unlockTime)
+                  << std::endl
+                  << InformationMsg("Unlocks at approximately: ")
+                  << InformationMsg(ZedUtilities::unixTimeToDate(unlockInUnixTime))
+                  << std::endl
+                  << std::endl;
+    }
+    /* Here we treat Unlock as Unix time, and treat it that way in the future */
+    else if (tx.unlockTime > std::time(nullptr))
+    {
+        std::cout << SuccessMsg(stream.str())
+                  << InformationMsg("Unlocks at: ")
+                  << InformationMsg(ZedUtilities::unixTimeToDate(tx.unlockTime))
+                  << std::endl
+                  << std::endl;
+    }
+    else
+    {
+        std::cout << SuccessMsg(stream.str()) << std::endl;
+    }
 }
 
 void printIncomingTransfer(const WalletTypes::Transaction tx)
