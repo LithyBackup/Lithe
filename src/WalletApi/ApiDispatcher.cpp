@@ -1,4 +1,5 @@
 // Copyright (c) 2018-2019, The TurtleCoin Developers
+// Copyright (c) 2019, The Lithe Project Development Team
 // 
 // Please see the included LICENSE file for more information.
 
@@ -495,9 +496,12 @@ std::tuple<Error, uint16_t> ApiDispatcher::createAddress(
 {
     const auto [error, address, privateSpendKey] = m_walletBackend->addSubWallet();
 
+    const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
+
     nlohmann::json j {
         {"address", address},
-        {"privateSpendKey", privateSpendKey}
+        {"privateSpendKey", privateSpendKey},
+        {"publicSpendKey", publicSpendKey}
     };
 
     res.set_content(j.dump(4) + "\n", "application/json");
